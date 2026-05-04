@@ -9,6 +9,7 @@ public struct TransformInfo {
 }
 public class FractalGenerator : MonoBehaviour
 {
+    public int depth;
     public float angle;
 
     public float firstlength = 10f;
@@ -17,13 +18,11 @@ public class FractalGenerator : MonoBehaviour
     Stack<TransformInfo> transformStack;
     Vector3 currentPosition;
     Quaternion currentRotation;    
-    public string path = "F[+F][-F]";
+    string path = "F";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
-        //currentPosition = transform.positon;
-        //currentRotation = transform.rotation;
+        path = makeString("F", "F/[&^^F]");
         DrawLsystem(path, firstlength, scale);
     }
 
@@ -31,6 +30,15 @@ public class FractalGenerator : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public string makeString(string baseS, string ruleF)
+    {
+        for(int i = 0; i < depth; i++)
+        {
+            baseS = baseS.Replace("F", ruleF);
+        }
+        return baseS;
     }
 
     public void DrawLsystem(string lSystemString, float length, float scale)
@@ -77,12 +85,29 @@ public class FractalGenerator : MonoBehaviour
                 break;
 
                 case '+':
-                currentRotation *= Quaternion.Euler(0, 0, angle);
+                currentRotation *= Quaternion.Euler(angle, 0, 0);
                 break;
 
                 case '-':
+                currentRotation *= Quaternion.Euler(-angle, 0, 0);
+                break;
+
+                case '&':
+                currentRotation *= Quaternion.Euler(0, angle, 0);
+                break;
+
+                case '^':
+                currentRotation *= Quaternion.Euler(0, -angle, 0);
+                break;
+
+                case '/':
+                currentRotation *= Quaternion.Euler(0, 0, angle);
+                break;
+
+                case '!':
                 currentRotation *= Quaternion.Euler(0, 0, -angle);
                 break;
+                
             }
         }
     }
