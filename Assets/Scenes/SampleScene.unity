@@ -148,10 +148,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22a44e5ea98a9184a9cf882512d6d81f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FractalGenerator
-  depth: 3
-  angle: 30
+  depth: 4
   firstlength: 10
   scale: 0.7
+  angleX: 30
+  angleY: 120
+  angleZ: 20
+  ruleF1: 'F^[+F[/+F][-F]]^[+F[/+F][-F]]^[+F[/+F][-F]]'
+  ruleF2: 
+  ruleX: 
   branchPrefab: {fileID: 6985184334634081090, guid: 38591aac175c7b84f9ca1eb560a484e9, type: 3}
 --- !u!4 &632876008
 Transform:

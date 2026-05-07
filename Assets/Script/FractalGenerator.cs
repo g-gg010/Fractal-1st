@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 
 public struct TransformInfo {
@@ -9,11 +10,21 @@ public struct TransformInfo {
 }
 public class FractalGenerator : MonoBehaviour
 {
+    public int EI;
+    public int SN;
+    public int TF;
+    public int JP;
     public int depth;
-    public float angle;
-
     public float firstlength = 10f;
-    public float scale = 0.7f;
+    public float scale = 0.5f;
+    public float Kakuritu;
+    public float angleX;
+    public float angleY;
+    public float angleZ;
+    public string ruleF1 = "F^[+F[/+F][-F]]^[+F[/+F][-F]]^[+F[/+F][-F]]";
+    public string ruleF2 = "F^[[+F^F^F]^[+F^F^F]^[+F^F^F]]";
+    public string ruleX;
+
     public LineRenderer branchPrefab;
     Stack<TransformInfo> transformStack;
     Vector3 currentPosition;
@@ -22,8 +33,10 @@ public class FractalGenerator : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        path = makeString("F", "F/[&^^F]");
+        path = makeString("X");
         DrawLsystem(path, firstlength, scale);
+
+        Debug.Log(path);
     }
 
     // Update is called once per frame
@@ -32,11 +45,50 @@ public class FractalGenerator : MonoBehaviour
         
     }
 
-    public string makeString(string baseS, string ruleF)
+    public string makeString(string baseS)
     {
-        for(int i = 0; i < depth; i++)
+        if(JP < 50)
         {
-            baseS = baseS.Replace("F", ruleF);
+            ruleX += "F";
+            firstlength = 15f;
+            scale = 0.5f;
+            Debug.Log("aaa");
+        }
+        for (int i = 0; i < depth; i++)
+        {
+            // 新しい世代の文字列を貯めるためのバッファ
+            StringBuilder nextGen = new StringBuilder();
+            // 今の文字列を1文字ずつチェック
+            foreach (char c in baseS)
+            {
+                if (c == 'F')
+                {
+                    //Fを見つけるたびに抽選！
+                    float probability = Random.value;
+                    //Debug.Log(probability);
+
+                    if (probability < Kakuritu)
+                    {
+                        nextGen.Append(ruleF1);
+                    }
+                    else
+                    {
+                        nextGen.Append(ruleF2);
+                    }
+                }
+                else if(c == 'X')
+                {
+                    nextGen.Append(ruleX);
+                }
+                else
+                {
+                    // F以外の記号はそのままコピー
+                    nextGen.Append(c);
+                }
+            }
+
+            // 1世代分をすべて書き換えたら、baseSを更新して次の深さへ
+            baseS = nextGen.ToString();
         }
         return baseS;
     }
@@ -85,30 +137,59 @@ public class FractalGenerator : MonoBehaviour
                 break;
 
                 case '+':
-                currentRotation *= Quaternion.Euler(angle, 0, 0);
+                currentRotation *= Quaternion.Euler(angleX, 0, 0);
                 break;
 
                 case '-':
-                currentRotation *= Quaternion.Euler(-angle, 0, 0);
+                currentRotation *= Quaternion.Euler(-angleX, 0, 0);
                 break;
 
                 case '&':
-                currentRotation *= Quaternion.Euler(0, angle, 0);
+                currentRotation *= Quaternion.Euler(0, angleY, 0);
                 break;
 
                 case '^':
-                currentRotation *= Quaternion.Euler(0, -angle, 0);
+                currentRotation *= Quaternion.Euler(0, -angleY, 0);
                 break;
 
                 case '/':
-                currentRotation *= Quaternion.Euler(0, 0, angle);
+                currentRotation *= Quaternion.Euler(0, 0, angleZ);
                 break;
 
                 case '!':
-                currentRotation *= Quaternion.Euler(0, 0, -angle);
+                currentRotation *= Quaternion.Euler(0, 0, -angleZ);
                 break;
                 
             }
         }
     }
+
+    public string makeChaos(string s)
+    {
+        StringBuilder nextGen = new StringBuilder();
+        foreach(char c in s)
+        {
+            if(c == 'F')
+            {
+                float probability = Random.value;
+                if(probability < (float)SN / 100f)
+                {
+                    nextGen.Append("/F");
+                }
+                else
+                {
+                    nextGen.Append("F");
+                }
+            }
+            else
+            {
+                nextGen.Append(c);
+            }
+        }
+
+        s = nextGen.ToString();
+        return s;
+    }
+
+
 }
