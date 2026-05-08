@@ -34,6 +34,7 @@ public class FractalGenerator : MonoBehaviour
     void Start()
     {
         path = makeString("X");
+        path = makeChaos(path);
         DrawLsystem(path, firstlength, scale);
 
         Debug.Log(path);
@@ -47,9 +48,21 @@ public class FractalGenerator : MonoBehaviour
 
     public string makeString(string baseS)
     {
+        if(EI < 50)
+        {
+            ruleF1 = "F[+F]";
+            ruleF2 = "F";
+            ruleX = "F^[+X]^[+X]^[+X]";
+        }
+        else
+        {
+            ruleF1 = "F[+F]";
+            ruleF2 = "F";
+            ruleX = "F[^X][!&X][/&X]";
+        }
         if(JP < 50)
         {
-            ruleX += "F";
+            ruleX += "X";
             firstlength = 15f;
             scale = 0.5f;
             Debug.Log("aaa");
@@ -99,6 +112,12 @@ public class FractalGenerator : MonoBehaviour
         currentPosition = transform.position;
         currentRotation = transform.rotation;
 
+        //TFの処理--------------------------
+        Kakuritu = (float)TF / 200f + 0.5f;
+        float variationX = (float)TF / 10;
+        float variationY = (float)TF / 3;
+        float variationZ = (float)TF / 20;
+        //TFの処理終わり---------------------
         foreach(char c in lSystemString){
             switch (c)
             {
@@ -137,27 +156,33 @@ public class FractalGenerator : MonoBehaviour
                 break;
 
                 case '+':
-                currentRotation *= Quaternion.Euler(angleX, 0, 0);
+                float rand = Random.value;
+                currentRotation *= Quaternion.Euler(angleX + (rand * 2f - 1f) * variationX, 0, 0);
                 break;
 
                 case '-':
-                currentRotation *= Quaternion.Euler(-angleX, 0, 0);
+                rand = Random.value;
+                currentRotation *= Quaternion.Euler(-angleX + (rand * 2f - 1f) * variationX, 0, 0);
                 break;
 
                 case '&':
-                currentRotation *= Quaternion.Euler(0, angleY, 0);
+                rand = Random.value;
+                currentRotation *= Quaternion.Euler(0, angleY + (rand * 2f - 1f) * variationY, 0);
                 break;
 
                 case '^':
-                currentRotation *= Quaternion.Euler(0, -angleY, 0);
+                rand = Random.value;
+                currentRotation *= Quaternion.Euler(0, -angleY + (rand * 2f - 1f) * variationY, 0);
                 break;
 
                 case '/':
-                currentRotation *= Quaternion.Euler(0, 0, angleZ);
+                rand = Random.value;
+                currentRotation *= Quaternion.Euler(0, 0, angleZ + (rand * 2f - 1f) * variationZ);
                 break;
 
                 case '!':
-                currentRotation *= Quaternion.Euler(0, 0, -angleZ);
+                rand = Random.value;
+                currentRotation *= Quaternion.Euler(0, 0, -angleZ + (rand * 2f - 1f) * variationZ);
                 break;
                 
             }
@@ -166,15 +191,28 @@ public class FractalGenerator : MonoBehaviour
 
     public string makeChaos(string s)
     {
+        if(SN < 50) SN = SN / 3;
         StringBuilder nextGen = new StringBuilder();
+        int count = 0; //最初に曲がるのを防ぐ。
         foreach(char c in s)
         {
+            if(count == 0)
+            {
+                count++;
+                nextGen.Append(c);
+                continue;
+            }
+
             if(c == 'F')
             {
                 float probability = Random.value;
-                if(probability < (float)SN / 100f)
+                if(probability < ((float)SN / 150f)/2)
                 {
                     nextGen.Append("/F");
+                }
+                else if(probability < (float)SN / 150f)
+                {
+                    nextGen.Append("!F");
                 }
                 else
                 {
@@ -185,11 +223,13 @@ public class FractalGenerator : MonoBehaviour
             {
                 nextGen.Append(c);
             }
+            count++;
         }
 
         s = nextGen.ToString();
         return s;
     }
 
+    
 
 }
