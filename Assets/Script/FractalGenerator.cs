@@ -15,12 +15,16 @@ public class FractalGenerator : MonoBehaviour
     public int TF;
     public int JP;
     public int depth;
-    public float firstlength = 10f;
-    public float scale = 0.5f;
+    public float length = 10f;
+    public float lengthscale = 0.5f;
+    public float widthscale;
     public float Kakuritu;
     public float angleX;
     public float angleY;
     public float angleZ;
+    public float basewidth = 1f;
+    public Color mbticolor;
+    public Color mbticolor1;
     public string ruleF1 = "F^[+F[/+F][-F]]^[+F[/+F][-F]]^[+F[/+F][-F]]";
     public string ruleF2 = "F^[[+F^F^F]^[+F^F^F]^[+F^F^F]]";
     public string ruleX;
@@ -29,15 +33,14 @@ public class FractalGenerator : MonoBehaviour
     Stack<TransformInfo> transformStack;
     Vector3 currentPosition;
     Quaternion currentRotation;    
-    string path = "F";
+    public string path = "F";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        path = makeString("X");
-        path = makeChaos(path);
-        DrawLsystem(path, firstlength, scale);
-
-        Debug.Log(path);
+        //path = makeString("X");
+        //path = makeChaos(path);
+        //DrawLsystem(path);
+        //Debug.Log(path);
     }
 
     // Update is called once per frame
@@ -63,8 +66,8 @@ public class FractalGenerator : MonoBehaviour
         if(JP < 50)
         {
             ruleX += "X";
-            firstlength = 15f;
-            scale = 0.5f;
+            length = 15f;
+            lengthscale = 0.5f;
             Debug.Log("aaa");
         }
         for (int i = 0; i < depth; i++)
@@ -106,8 +109,9 @@ public class FractalGenerator : MonoBehaviour
         return baseS;
     }
 
-    public void DrawLsystem(string lSystemString, float length, float scale)
+    public void DrawLsystem(string lSystemString)
     {
+        int currentDepth = 1;
         transformStack = new Stack<TransformInfo>();
         currentPosition = transform.position;
         currentRotation = transform.rotation;
@@ -122,11 +126,13 @@ public class FractalGenerator : MonoBehaviour
             switch (c)
             {
                 case 'F':
-                //線を引いて進
-                // direction は「どれくらい進むか」のベクトル
+                //線を引いて進む
                 Vector3 nextPosition = currentPosition + (currentRotation * Vector3.up * length);
 
                 LineRenderer line = Instantiate(branchPrefab);
+
+                //線の色、太さを決定する。
+                SetLineColorandWidth(line, currentDepth);
                 //set startPos
                 line.SetPosition(0, currentPosition);
                 //set endPos
@@ -144,7 +150,8 @@ public class FractalGenerator : MonoBehaviour
                 };
                 transformStack.Push(info);
 
-                length *= scale;
+                length *= lengthscale;
+                currentDepth++;
                 break;
 
                 case ']':
@@ -153,6 +160,7 @@ public class FractalGenerator : MonoBehaviour
                 currentPosition = savedInfo.position;
                 currentRotation = savedInfo.rotation;
                 length = savedInfo.length;
+                currentDepth--;
                 break;
 
                 case '+':
@@ -228,6 +236,22 @@ public class FractalGenerator : MonoBehaviour
 
         s = nextGen.ToString();
         return s;
+    }
+
+    void SetLineColorandWidth(LineRenderer line, int currentDepth)
+    {
+        //太さを決定する。
+        float width = basewidth * Mathf.Pow(widthscale, currentDepth-1);
+        line.startWidth = width;
+        line.endWidth = width * widthscale;
+
+        //色を決定する。
+        line.startColor = mbticolor;
+        line.endColor = mbticolor1;
+
+        //影を落とし、他の枝の影を受ける。
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        line.receiveShadows = true;
     }
 
     
