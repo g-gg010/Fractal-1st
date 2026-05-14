@@ -72,8 +72,15 @@ public class FractalGenerator : MonoBehaviour
             ruleX += "X";
             length = 15f;
             lengthscale = 0.6f;
-            Debug.Log("aaa");
+            //Debug.Log("aaa");
         }
+        else
+        {
+            length = 15f;
+            lengthscale = 0.8f;
+        }
+
+        Debug.Log(lengthscale);
 
         for (int i = 0; i < depth; i++)
         {
@@ -202,16 +209,15 @@ public class FractalGenerator : MonoBehaviour
         }
     }
 
-    public string makeChaos(string s)
+    public string makeChaos(string s, int currentdepth)
     {
         if(SN < 50) SN = SN / 3;
         StringBuilder nextGen = new StringBuilder();
-        int count = 0; //最初に曲がるのを防ぐ。
+        
         foreach(char c in s)
         {
-            if(count == 0)
+            if(currentdepth == 1)
             {
-                count++;
                 nextGen.Append(c);
                 continue;
             }
@@ -236,7 +242,6 @@ public class FractalGenerator : MonoBehaviour
             {
                 nextGen.Append(c);
             }
-            count++;
         }
 
         s = nextGen.ToString();
@@ -273,7 +278,4 @@ public class FractalGenerator : MonoBehaviour
         treevase = new GameObject("treease");
         treevase.transform.position = transform.position;
     }
-
-    
-
 }

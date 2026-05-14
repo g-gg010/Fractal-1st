@@ -66,13 +66,13 @@ public class UIManager : MonoBehaviour
         if(clickcount >= 1) return;
         clickcount++;
         fractalGenerator.path = fractalGenerator.makeString("X");
-        fractalGenerator.path = fractalGenerator.makeChaos(fractalGenerator.path);
+        fractalGenerator.path = fractalGenerator.makeChaos(fractalGenerator.path, 1);
         fractalGenerator.DrawLsystem(fractalGenerator.path);
-        Debug.Log(fractalGenerator.path);
-        Debug.Log(fractalGenerator.EI);
-        Debug.Log(fractalGenerator.SN);
-        Debug.Log(fractalGenerator.TF);
-        Debug.Log(fractalGenerator.JP);
+        //Debug.Log(fractalGenerator.path);
+        //Debug.Log(fractalGenerator.EI);
+        //Debug.Log(fractalGenerator.SN);
+        //Debug.Log(fractalGenerator.TF);
+        //Debug.Log(fractalGenerator.JP);
         OpenCloseSetting();
     }
 
