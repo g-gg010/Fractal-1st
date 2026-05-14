@@ -16,7 +16,7 @@ public class FractalGenerator : MonoBehaviour
     public int JP;
     public int depth;
     public float length = 10f;
-    public float lengthscale = 0.5f;
+    public float lengthscale = 0.8f;
     public float widthscale;
     public float Kakuritu;
     public float angleX;
@@ -34,9 +34,12 @@ public class FractalGenerator : MonoBehaviour
     Vector3 currentPosition;
     Quaternion currentRotation;    
     public string path = "F";
+    private GameObject treevase;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        treevase = new GameObject("treevase");
+        treevase.transform.position = transform.position;
         //path = makeString("X");
         //path = makeChaos(path);
         //DrawLsystem(path);
@@ -54,22 +57,24 @@ public class FractalGenerator : MonoBehaviour
         if(EI < 50)
         {
             ruleF1 = "F[+F]";
-            ruleF2 = "F";
+            ruleF2 = "F[-F]";
             ruleX = "F^[+X]^[+X]^[+X]";
         }
         else
         {
-            ruleF1 = "F[+F]";
+            ruleF1 = "F[+F][+F]";
             ruleF2 = "F";
             ruleX = "F[^X][!&X][/&X]";
         }
+
         if(JP < 50)
         {
             ruleX += "X";
             length = 15f;
-            lengthscale = 0.5f;
+            lengthscale = 0.6f;
             Debug.Log("aaa");
         }
+
         for (int i = 0; i < depth; i++)
         {
             // 新しい世代の文字列を貯めるためのバッファ
@@ -129,7 +134,7 @@ public class FractalGenerator : MonoBehaviour
                 //線を引いて進む
                 Vector3 nextPosition = currentPosition + (currentRotation * Vector3.up * length);
 
-                LineRenderer line = Instantiate(branchPrefab);
+                LineRenderer line = Instantiate(branchPrefab, treevase.transform);
 
                 //線の色、太さを決定する。
                 SetLineColorandWidth(line, currentDepth);
@@ -235,6 +240,9 @@ public class FractalGenerator : MonoBehaviour
         }
 
         s = nextGen.ToString();
+
+        //ひねるを大きく
+        angleZ += SN/20f;
         return s;
     }
 
@@ -242,6 +250,7 @@ public class FractalGenerator : MonoBehaviour
     {
         //太さを決定する。
         float width = basewidth * Mathf.Pow(widthscale, currentDepth-1);
+        if(currentDepth == 1) width *= 2.0f;
         line.startWidth = width;
         line.endWidth = width * widthscale;
 
@@ -252,6 +261,17 @@ public class FractalGenerator : MonoBehaviour
         //影を落とし、他の枝の影を受ける。
         line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
         line.receiveShadows = true;
+    }
+
+    public void TreeReset()
+    {
+        if(treevase != null)
+        {
+            Destroy(treevase);
+        }
+
+        treevase = new GameObject("treease");
+        treevase.transform.position = transform.position;
     }
 
     
